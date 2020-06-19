@@ -42,7 +42,7 @@ DoorStatus LockController::unlockDoor()
 
 DoorStatus LockController::lockDoor()
 {
-    return latch->open();
+    return latch->close();
 }
 
 void LockController::wait()
