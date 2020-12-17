@@ -1,49 +1,52 @@
-#include <iostream>
-#include <stdlib.h>
-#include <time.h>
-#include "x_zero.h"
-
+﻿#include <iostream>
+#include "game.h"
 using namespace std;
 
-int main() {
-    short int first;
-    int i, j;
+int main()
+{
+	setlocale(LC_ALL, "rus");
 
-    system("chcp 1251 > null");       //меняем кодовую страницу на 1251
+	char player_symbol=0;
+	while (player_symbol != 'x' && player_symbol != '0'){
+		system("cls");
+		cout << "Выбрите 0 или x: ";
+		cin >> player_symbol;
+	}
 
-    Game player = initGame('X');
+	Game game = initGame(player_symbol);
+	while (true){
 
-    srand((unsigned)time(NULL));
-    first = rand() % 2;
+		if (!updateGame(&game)) {
+			updateDisplay(game);
+			if (game.isUserTurn)
+				userTurn(&game);
+			else
+				botTurn(&game);
+			updateDisplay(game);
+		}
+		else{
+			switch (game.status) {
+			case BOT_WIN:
+				cout << "Вы проиграли.\n";
+				break;
+			case USER_WIN:
+				cout << "Вы выиграли.\n";
+				break;
+			case NOT_WIN:
+				cout << "Ничья.\n";
+				break;
+			default:
+				cout << "err";
+				return 0;
+			}
 
-    if (first) {
-        player.isUserTurn = true;
-        player.userChar = 'X';
-        player.botChar = 'O';
-        player.status = PLAY;
-    }
-    else {
-        player.isUserTurn = false;
-        player.userChar = 'O';
-        player.botChar = 'X';
-        player.status = PLAY;
-    }
-
-    while (!updateGame(&player)) {
-        if (player.isUserTurn) {
-            userTurn(&player);
-        }
-        else {
-            botTurn(&player);
-        }
-        updateDisplay(player);
-    }
-
-    switch (player.status) {
-    case USER_WIN: cout << "User WIN!"; break;      //в случае победы пользователя высветится надпись о том, что победитель - игрок
-    case BOT_WIN: cout << "Bot WIN!"; break;        //в случае победы бота высветится надпись о том, что победитель - бот
-    case NOT_WIN: cout << "Draw!"; break;           //в случае ничьей высветится надпись о том, что ничья
-    }
-
-    return 0;
+			cout << "Сыграем еще(0/1)? ";
+			short replay;
+			cin >> replay;
+			if (replay)
+				game = initGame(player_symbol);
+			else
+				return 0;
+		}
+	}
 }
